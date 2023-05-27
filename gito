@@ -1,0 +1,174 @@
+#!/bin/sh
+
+
+gito_help() { \
+	echo "CLI Helper for GitHub\n"
+	echo "Syntax: gito [OPTION]"
+	echo "Options:"
+	echo "-h    for this help page"
+	echo "-a    to choose/add single/multiple files"
+	echo "-A    to add all files"
+	echo "-c    for commiting files"
+	echo "-o    to add or change origin"
+	echo "-p    for pushing files to origin\n"
+	echo "Developer: Kr. PK"
+	echo "Follow on GitHub: https://github.com/kr-pk/"
+}
+
+gito_add_more() { \
+	printf "\nMore File/s(y/n): "
+	read more_file
+	case $more_file in
+		[yY][eE][sS]|[yY] )
+			gito_add_one
+			break;;
+		[nn][oO]|[nN] )
+			echo "GoodBye...."
+			exit 1
+			break;;
+		[qQ][uU][iI][tT]|[qQ] )
+			echo "GoodBye...."
+			exit 1
+			break;;
+		* )
+			echo "Error: 404...."
+			exit 1
+			break;;
+	esac
+}
+
+gito_add_one() { \
+	printf "File/s Name: "
+	read file_name
+	case $file_name in
+		[qQ][uU][iI][tT]|[qQ] )
+			echo "GoodBye...."
+			exit 1
+			break;;
+		"" )
+			echo "File Name Empty...."
+			exit 1
+			break;;
+		* )
+			git add $file_name
+			break;;
+	esac
+	gito_add_more
+}
+
+gito_add_all() { \
+	printf "Remove .git?(y/n): "
+	read remove_git
+	case $remove_git in
+		[yY][eE][sS]|[yY] )
+			rm -rf .git
+			git init
+			git add -A
+			echo "Removed .git & All Files Added...."
+			break;;
+		[nN][oO]|[nN] )
+			git add -A
+			echo "All Files Added...."
+			break;;
+		[qQ][uU][iI][tT]|[qQ] )
+			echo "GoodBye...."
+			exit 1
+			break;;
+		* )
+			echo "Error: 404...."
+			exit 1
+			break;;
+	esac
+}
+
+gito_commit_files() { \
+	printf "Commit Message(Empty For None): "
+	read commit_message
+	case $commit_message in
+		[qQ][uU][iI][tT]|[qQ] )
+			echo "GoodBye"
+			exit 1
+			break;;
+		"" )
+			git commit --allow-empty-message
+			break;;
+		*  )
+			git commit -m "$commit_message"
+			break;;
+	esac
+}
+
+gito_add_origin () { \
+	printf "Add/Change Origin?(y/n): "
+	read origin_option
+	case $origin_option in
+		[yY][eE][sS]|[yY] )
+			printf "Origin Url: "
+			read origin_url
+			git remote add origin $origin_url
+			git remote -v
+			break;;
+		[nN][oO]|[nN] )
+			echo "GoodBye...."
+			exit 1
+			break;;
+		[qQ][uU][iI][tT]|[qQ] )
+			echo "GoodBye...."
+			exit 1
+			break;;			
+		* )
+			echo "Error: 404...."
+			break;;
+	esac
+}
+
+gito_push_files() { \
+	printf "Normal/Force Push(n/f): "
+	read push_file
+	case $push_file in
+		[nN][oO][rR][mM][aA][lL]|[nN] )
+			printf "Branch Name: "
+			read branch_name
+			git push origin $branch_name
+			break;;
+		[fF][oO][rR][cC][eE]|[fF] )
+			printf "Branch Name: "
+			read branch_name
+			git push -f origin $branch_name
+			break;;
+		[qQ][uU][iI][tT]|[qQ] )
+			echo "GoodBye...."
+			exit 1
+			break;;
+		* )
+			echo "Error: 404...."
+			break;;
+	esac
+}
+
+while getopts ":haAcop" option; do
+	case $option in
+		h )
+			gito_help
+			break;;
+		a )
+			gito_add_one
+			break;;
+		A )
+			gito_add_all
+			break;;
+		c )
+			gito_commit_files
+			break;;
+		o )
+			gito_add_origin
+			break;;
+		p )
+			gito_push_files
+			break;;
+		\? )
+			echo "Error: Invalid Option"
+			echo "Error: Use '-h' for help page"
+			break;;
+	esac
+done
